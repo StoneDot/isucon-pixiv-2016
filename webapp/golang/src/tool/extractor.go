@@ -59,7 +59,7 @@ func main() {
 	}
 
 	dir := "images/"
-	err = os.MkdirAll(dir, 775)
+	err = os.MkdirAll(dir, 0755)
 	for _, p := range posts {
 		ext := ""
 		switch p.Mime {
