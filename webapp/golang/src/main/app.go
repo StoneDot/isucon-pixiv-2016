@@ -224,10 +224,12 @@ func makePosts(results []Post, CSRFToken string, allComments bool) ([]Post, erro
 
 	userLists := make(map[int]User)
 	for uid := range userIdLists {
-		uerr := db.Get(userLists[uid], "SELECT * FROM `users` WHERE `id` = ?", uid)
+		var user User
+		uerr := db.Get(&user, "SELECT * FROM `users` WHERE `id` = ?", uid)
 		if uerr != nil {
 			return nil, uerr
 		}
+		userLists[uid] = user
 	}
 
 	for _, p := range posts {
