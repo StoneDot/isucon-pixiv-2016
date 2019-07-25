@@ -181,6 +181,8 @@ func getFlash(w http.ResponseWriter, r *http.Request, key string) string {
 func makePosts(results []Post, CSRFToken string, allComments bool) ([]Post, error) {
 	var posts []Post
 
+	userIdLists := make(map[int]struct{})
+
 	for _, p := range results {
 		err := db.Get(&p.CommentCount, "SELECT COUNT(*) AS `count` FROM `comments` WHERE `post_id` = ?", p.ID)
 		if err != nil {
@@ -198,10 +200,7 @@ func makePosts(results []Post, CSRFToken string, allComments bool) ([]Post, erro
 		}
 
 		for i := 0; i < len(comments); i++ {
-			uerr := db.Get(&comments[i].User, "SELECT * FROM `users` WHERE `id` = ?", comments[i].UserID)
-			if uerr != nil {
-				return nil, uerr
-			}
+			userIdLists[comments[i].UserID] = struct{}{}
 		}
 
 		// reverse
@@ -211,10 +210,7 @@ func makePosts(results []Post, CSRFToken string, allComments bool) ([]Post, erro
 
 		p.Comments = comments
 
-		perr := db.Get(&p.User, "SELECT * FROM `users` WHERE `id` = ?", p.UserID)
-		if perr != nil {
-			return nil, perr
-		}
+		userIdLists[p.UserID] = struct{}{}
 
 		p.CSRFToken = CSRFToken
 
@@ -223,6 +219,21 @@ func makePosts(results []Post, CSRFToken string, allComments bool) ([]Post, erro
 		}
 		if len(posts) >= postsPerPage {
 			break
+		}
+	}
+
+	userLists := make(map[int]User)
+	for uid := range userIdLists {
+		uerr := db.Get(userLists[uid], "SELECT * FROM `users` WHERE `id` = ?", uid)
+		if uerr != nil {
+			return nil, uerr
+		}
+	}
+
+	for _, p := range posts {
+		p.User = userLists[p.UserID]
+		for _, c := range p.Comments {
+			c.User = userLists[c.UserID]
 		}
 	}
 
