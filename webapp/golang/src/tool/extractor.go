@@ -70,9 +70,9 @@ func main() {
 		case "image/gif":
 			ext = ".gif"
 		}
-		filename := fmt.Sprintf("%s.%s", strconv.Itoa(p.ID), ext)
+		filename := fmt.Sprintf("%s%s", strconv.Itoa(p.ID), ext)
 		path := dir + filename
-		file, err := os.Open(path)
+		file, err := os.Create(path)
 		if err != nil {
 			stderr.Println("Failed to open file: " + filename)
 			continue
