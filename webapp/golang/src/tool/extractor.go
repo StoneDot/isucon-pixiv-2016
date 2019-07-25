@@ -53,7 +53,7 @@ func main() {
 	defer db.Close()
 
 	posts := []Post{}
-	err = db.Select(&posts, "SELECT * FROM `posts`")
+	err = db.Select(&posts, "SELECT `id`, `imgdata`, `mime` FROM `posts`")
 	if err != nil {
 		panic(err)
 	}
