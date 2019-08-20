@@ -27,6 +27,8 @@ import (
 	"github.com/zenazn/goji/web"
 )
 
+import _ "net/http/pprof"
+
 var (
 	db    *sqlx.DB
 	store *gsm.MemcacheStore
