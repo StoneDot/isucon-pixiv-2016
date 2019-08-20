@@ -223,13 +223,14 @@ func makePosts(results []Post, CSRFToken string, allComments bool) ([]Post, erro
 	}
 
 	userLists := make(map[int]User)
-	for uid := range userIdLists {
-		var user User
-		uerr := db.Get(&user, "SELECT * FROM `users` WHERE `id` = ?", uid)
-		if uerr != nil {
-			return nil, uerr
-		}
-		userLists[uid] = user
+	rows, err := db.Queryx("SELECT * FROM `users` WHERE `id` IN (?);", userIdLists)
+	if err != nil {
+		return nil, err
+	}
+	for rows.Next() {
+		var u User
+		err = rows.StructScan(&u)
+		userLists[u.ID] = u
 	}
 
 	for _, p := range posts {
