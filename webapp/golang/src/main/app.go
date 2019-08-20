@@ -222,8 +222,13 @@ func makePosts(results []Post, CSRFToken string, allComments bool) ([]Post, erro
 		}
 	}
 
+	ids := make([]int, len(userIdLists))
+	for id, _ := range userIdLists {
+		ids = append(ids, id)
+	}
+
 	userLists := make(map[int]User)
-	rows, err := db.Queryx("SELECT * FROM `users` WHERE `id` IN (?);", userIdLists)
+	rows, err := db.Queryx("SELECT * FROM `users` WHERE `id` IN (?);", ids)
 	if err != nil {
 		return nil, err
 	}
