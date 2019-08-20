@@ -230,6 +230,9 @@ func makePosts(results []Post, CSRFToken string, allComments bool) ([]Post, erro
 	for rows.Next() {
 		var u User
 		err = rows.StructScan(&u)
+		if err != nil {
+			return nil, err
+		}
 		userLists[u.ID] = u
 	}
 
