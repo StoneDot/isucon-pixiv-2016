@@ -228,10 +228,11 @@ func makePosts(results []Post, CSRFToken string, allComments bool) ([]Post, erro
 	}
 
 	userLists := make(map[int]User)
-	rows, err := db.Queryx("SELECT * FROM `users` WHERE `id` IN (?);", ids)
-	if err != nil {
-		return nil, err
-	}
+	query, args, err := sqlx.In("SELECT * FROM `users` WHERE `id` IN (?);", ids)
+	query = db.Rebind(query)
+	rows, err := db.Queryx(query, args...)
+	//var users []User
+	//err = db.Select(&users, query)
 	for rows.Next() {
 		var u User
 		err = rows.StructScan(&u)
